@@ -14,17 +14,16 @@ class ProdukModel {
     }
 
     public function getRekomendasi() {
-        $sql = "SELECT nama, harga FROM produk WHERE harga > 100000
+        $sql = "SELECT p.nama, p.harga, 'Pria' AS kategori
+                FROM produk p
+                JOIN kategori k ON p.id_kategori = k.id_kategori
+                WHERE k.nama LIKE 'Pria%' AND p.stok > 0
                 UNION
-                SELECT nama, harga FROM produk WHERE stok < 5";
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getRekomendasiUnionAll() {
-        $sql = "SELECT nama, harga FROM produk WHERE harga > 100000
-                UNION ALL
-                SELECT nama, harga FROM produk WHERE stok < 5";
+                SELECT p.nama, p.harga, 'Wanita' AS kategori
+                FROM produk p
+                JOIN kategori k ON p.id_kategori = k.id_kategori
+                WHERE k.nama LIKE 'Wanita%' AND p.stok > 0";
+                
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

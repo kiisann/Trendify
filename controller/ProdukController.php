@@ -11,7 +11,6 @@ class ProdukController {
     public function tampilProduk() {
         $data_produk = $this->model->tampil();
         $data_union = $this->model->getRekomendasi();
-        $data_union_all = $this->model->getRekomendasiUnionAll();
 
         include 'view/produk.php';
     }

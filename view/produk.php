@@ -30,8 +30,7 @@ if (!empty($data_produk)) {
 
 <hr class="my-5">
 
-<h3 class="fw-bold text-uppercase mb-2" style="letter-spacing: 2px;">Rekomendasi Produk (UNION)</h3>
-<p class="text-muted">Bagian ini menggunakan set operation UNION.</p>
+<h3 class="fw-bold text-uppercase mb-2" style="letter-spacing: 2px;">Rekomendasi Produk</h3>
 
 <div class="row">
 <?php
@@ -51,23 +50,4 @@ if (!empty($data_union)) {
 </div>
 
 <hr class="my-5">
-
-<h3 class="fw-bold text-uppercase mb-2" style="letter-spacing: 2px;">Rekomendasi Produk (UNION ALL)</h3>
-<p class="text-muted">Bagian ini menggunakan set operation UNION ALL.</p>
-
-<div class="row">
-<?php
-if (!empty($data_union_all)) {
-    foreach ($data_union_all as $row) {
-?>
-    <div class="col-md-4">
-        <div class="card p-3 mb-3 shadow-sm border-0 text-center">
-            <h6 class="fw-bold"><?= $row['nama']; ?></h6>
-            <p class="text-muted small mb-0">Rp <?= number_format($row['harga'], 0, ',', '.'); ?></p>
-        </div>
-    </div>
-<?php
-    }
-}
-?>
 </div>
