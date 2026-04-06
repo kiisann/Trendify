@@ -20,7 +20,7 @@
                             <td class="py-4 text-muted"><?= date('d M Y', strtotime($row['tanggal'])) ?></td>
                             <td class="py-4 fw-medium"><?= $row['nama_produk'] ?></td>
                             <td class="py-4 text-center"><?= $row['jumlah'] ?></td>
-                            <td class="py-4">Rp <?= number_format($row['harga'] * $row['jumlah'], 0, ',', '.') ?></td>
+                            <td class="py-4">Rp <?= number_format($row['total'], 0, ',', '.') ?></td>
                             <td class="py-4 text-center">
                                 <?php if ($row['status'] == 'selesai'): ?>
                                     <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">Selesai</span>

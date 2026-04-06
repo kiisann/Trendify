@@ -18,7 +18,8 @@ class LoginController {
             $_SESSION['user'] = [
                 'id' => $user['id_user'],
                 'nama' => $user['nama'],
-                'role' => $user['role']
+                'role' => $user['role'],
+                'alamat' => $user['alamat']
             ];
 
             if ($user['role'] == 'admin') {

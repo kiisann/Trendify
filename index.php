@@ -48,8 +48,29 @@ if ($page == 'produk-admin' && isset($_POST['update'])) {
 }
 
 // HANDLE DELETE
-if ($page == 'produk-admin' && isset($_GET['hapus'])) {
+if ($page == 'produk-admin' && isset($_GET['id'])) {
     $produkAdminCtrl->delete();
+}
+
+//KERANJANG
+if ($page == 'tambah-keranjang' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $produkCtrl->tambahKeKeranjang();
+    exit;
+}
+
+if ($page == 'hapus-keranjang' && isset($_GET['id'])) {
+    $transaksiCtrl->hapusItemKeranjang();
+    exit;
+}
+
+if ($page == 'checkout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $transaksiCtrl->tampilPayment();
+    exit;
+}
+
+if ($page == 'proses-bayar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $transaksiCtrl->prosesBayar();
+    exit;
 }
 
 // PROTEKSI HALAMAN
@@ -249,13 +270,16 @@ if ($page == 'home' && $_SESSION['user']['role'] == 'admin') {
                 $produkCtrl->tampilProduk();
             }
             elseif($page == 'keranjang'){
-                include 'view/keranjang.php';
+                $transaksiCtrl->tampilKeranjang();
             }
             elseif($page == 'riwayat'){
                 $transaksiCtrl->tampilRiwayat();
             }
             elseif($page == 'deadlock'){
                 include 'view/deadlock.php';
+            }
+            elseif($page == 'checkout-selesai'){
+                $transaksiCtrl->tampilSelesai();
             }
             else{
                 include 'view/home.php';

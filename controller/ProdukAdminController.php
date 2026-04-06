@@ -8,10 +8,10 @@ class ProdukAdminController {
         $this->model = new ProdukAdminModel($pdo);
     }
 
-    // 🔥 HALAMAN UTAMA ADMIN PRODUK
+    // HALAMAN UTAMA ADMIN PRODUK
     public function index() {
 
-        // 🔒 PROTEKSI ROLE
+        // PROTEKSI ROLE
         if ($_SESSION['user']['role'] != 'admin') {
             header("Location: ?page=home");
             exit;
@@ -23,7 +23,7 @@ class ProdukAdminController {
         include 'view/ProdukAdmin.php';
     }
 
-    // 🔥 TAMBAH PRODUK
+    // TAMBAH PRODUK
     public function tambah() {
         if (isset($_POST['simpan'])) {
 
@@ -39,7 +39,7 @@ class ProdukAdminController {
         }
     }
 
-    // 🔥 UPDATE PRODUK
+    // UPDATE PRODUK
     public function update() {
         if (isset($_POST['update'])) {
 
@@ -56,14 +56,16 @@ class ProdukAdminController {
         }
     }
 
-    // 🔥 HAPUS PRODUK
+    // HAPUS PRODUK
     public function delete() {
         if (isset($_GET['id'])) {
-
             $id = $_GET['id'];
 
             if ($this->model->delete($id)) {
                 header("Location: ?page=produk-admin&status=deleted");
+                exit;
+            } else {
+                header("Location: ?page=produk-admin&status=error");
                 exit;
             }
         }
