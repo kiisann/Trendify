@@ -1,17 +1,84 @@
 <?php 
+session_start();    
+
 include 'config/koneksi.php'; 
 // Estafet Koneksi PDO ke Controller & Model
 include_once 'model/TransaksiModel.php';
 include_once 'controller/TransaksiController.php';
-include_once 'model/ProdukModel.php'; // WAJIB ADA supaya ProdukController bisa kerja
+include_once 'model/ProdukModel.php';
 include_once 'controller/ProdukController.php';
+include_once 'model/LoginModel.php';
+include_once 'controller/LoginController.php';
+include_once 'model/DashboardAdminModel.php';
+include_once 'controller/DashboardAdminController.php';
+include_once 'model/ProdukAdminModel.php';
+include_once 'controller/ProdukAdminController.php';
 
 // Inisialisasi Objek Controller
+$loginCtrl = new LoginController($pdo);
 $produkCtrl = new ProdukController($pdo);
 $transaksiCtrl = new TransaksiController($pdo);
+$dashboardCtrl = new DashboardAdminController($pdo);
+$produkAdminCtrl = new ProdukAdminController($pdo);
 
 // Menangani logic router
-$page = isset($_GET['page']) ? $_GET['page'] : 'home';
+// $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+$page = $_GET['page'] ?? 'login';
+
+// HANDLE LOGIN
+if ($page == 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $loginCtrl->login();
+    exit;
+}
+    
+// HANDLE LOGOUT
+if ($page == 'logout') {
+    $loginCtrl->logout();
+    exit;
+}
+
+// HANDLE TAMBAH
+if ($page == 'produk-admin' && isset($_POST['simpan'])) {
+    $produkAdminCtrl->tambah();
+}
+
+// HANDLE UPDATE
+if ($page == 'produk-admin' && isset($_POST['update'])) {
+    $produkAdminCtrl->update();
+}
+
+// HANDLE DELETE
+if ($page == 'produk-admin' && isset($_GET['hapus'])) {
+    $produkAdminCtrl->delete();
+}
+
+// PROTEKSI HALAMAN
+$public_pages = ['login'];
+
+if (!isset($_SESSION['user']) && !in_array($page, $public_pages)) {
+    header("Location: ?page=login");
+    exit;
+}
+
+// REDIRECT
+if (isset($_SESSION['user']) && $page == 'login') {
+    header("Location: ?page=home");
+    exit;
+}
+
+$totalProduk = null;
+$totalUser = null;
+$totalTransaksi = null;
+
+if ($page == 'home' && $_SESSION['user']['role'] == 'admin') {
+    include_once 'model/DashboardAdminModel.php';
+
+    $dash = new DashboardAdminModel($pdo);
+
+    $totalProduk = $dash->totalProduk();
+    $totalUser = $dash->totalUser();
+    $totalTransaksi = $dash->totalTransaksi();
+}
 ?>
 
 <!DOCTYPE html>
@@ -126,6 +193,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 </head>
 <body>
 
+<?php if ($page != 'login'): ?>
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container text-center">
         <a class="navbar-brand" href="?page=home">TRENDIFY.</a>
@@ -134,43 +202,74 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
         </button>
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link <?= (!isset($_GET['page']) || $_GET['page'] == 'home') ? 'active' : '' ?>" href="?page=home">BERANDA</a></li>
-                <li class="nav-item"><a class="nav-link <?= (isset($_GET['page']) && $_GET['page'] == 'produk') ? 'active' : '' ?>" href="?page=produk">PRODUCT</a></li>
-                <li class="nav-item"><a class="nav-link <?= (isset($_GET['page']) && $_GET['page'] == 'keranjang') ? 'active' : '' ?>" href="?page=keranjang">KERANJANG</a></li>
-                <li class="nav-item"><a class="nav-link <?= (isset($_GET['page']) && $_GET['page'] == 'riwayat') ? 'active' : '' ?>" href="?page=riwayat">RIWAYAT</a></li>
-                <li class="nav-item"><a class="nav-link <?= (isset($_GET['page']) && $_GET['page'] == 'deadlock') ? 'active' : '' ?>" href="?page=deadlock">DEADLOCK</a></li>
+            <?php if ($_SESSION['user']['role'] == 'admin'): ?>
+                <!-- ADMIN -->
+                <li class="nav-item"><a class="nav-link <?= ($page == 'dashboard') ? 'active' : '' ?>" href="?page=dashboard">DASHBOARD</a></li>
+                <li class="nav-item"><a class="nav-link <?= ($page == 'produk-admin') ? 'active' : '' ?>" href="?page=produk-admin">PRODUK</a></li>
+            <?php else: ?>
+                <!-- USER -->
+                <li class="nav-item"><a class="nav-link <?= ($page == 'home') ? 'active' : '' ?>" href="?page=home">BERANDA</a></li>
+                <li class="nav-item"><a class="nav-link <?= ($page == 'produk') ? 'active' : '' ?>" href="?page=produk">PRODUCT</a></li>
+                <li class="nav-item"><a class="nav-link <?= ($page == 'keranjang') ? 'active' : '' ?>" href="?page=keranjang">KERANJANG</a></li>
+                <li class="nav-item"><a class="nav-link <?= ($page == 'riwayat') ? 'active' : '' ?>" href="?page=riwayat">RIWAYAT</a></li>
+            <?php endif; ?>
             </ul>
         </div>
-        <div class="d-none d-lg-block" style="width: 120px;"></div>
+        <div class="d-none d-lg-block" style="width: 150px;">
+            <?php if (isset($_SESSION['user'])): ?>
+                <small>
+                    <?= $_SESSION['user']['nama']; ?> 
+                    (<?= $_SESSION['user']['role']; ?>)
+                </small><br>
+                <a href="?page=logout" class="text-danger small">Logout</a>
+            <?php endif; ?>
+        </div>
     </div>
 </nav>
+<?php endif; ?>
 
-<div class="content-wrapper <?= ($page != 'home') ? 'container page-padding' : '' ?>">
-    <div class="pdt-card">
-        <?php 
-        if($page == 'produk'){
-            // Ini akan memanggil ProdukController -> ProdukModel -> CALL select_produk()
-            $produkCtrl->tampilProduk();
-        }
-        elseif($page == 'keranjang'){
-            include 'view/keranjang.php';
-        }
-        elseif($page == 'riwayat'){
-            $transaksiCtrl->tampilRiwayat(1);
-        }
-        elseif($page == 'deadlock'){
-            include 'view/deadlock.php';
-        }
-        else{
-            include 'view/home.php';
-        }
-        ?>
+<?php if ($page == 'login'): ?>
+    <div class="content-wrapper" style="margin-bottom:0;">
+        <?php include 'view/login.php'; ?>
     </div>
-</div>
+<?php else: ?>
+    <div class="content-wrapper <?= ($page != 'home') ? 'container page-padding' : '' ?>">
+        <div class="pdt-card">
+            <?php 
+            if($page == 'logout'){
+                $loginCtrl->logout();
+            }
+            elseif($page == 'dashboard'){
+                $dashboardCtrl->index();
+            }
+            elseif($page == 'produk-admin'){
+                $produkAdminCtrl->index();
+            }
+            elseif($page == 'produk'){
+                $produkCtrl->tampilProduk();
+            }
+            elseif($page == 'keranjang'){
+                include 'view/keranjang.php';
+            }
+            elseif($page == 'riwayat'){
+                $transaksiCtrl->tampilRiwayat();
+            }
+            elseif($page == 'deadlock'){
+                include 'view/deadlock.php';
+            }
+            else{
+                include 'view/home.php';
+            }
+            ?>
+        </div>
+    </div>
+<?php endif; ?>
 
+<?php if ($page != 'login'): ?>
 <footer class="py-5 text-center bg-light border-top">
     <p class="text-muted small">© 2026 Trendify. Built for Pemrosesan Data Terdistribusi.</p>
 </footer>
+<?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

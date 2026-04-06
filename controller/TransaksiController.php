@@ -8,8 +8,15 @@ class TransaksiController {
         $this->model = new TransaksiModel($pdo);
     }
 
-    public function tampilRiwayat($id_user) {
+    public function tampilRiwayat() {
+        if (!isset($_SESSION['user'])) {
+            header("Location: ?page=login");
+            exit;
+        }
+
+        $id_user = $_SESSION['user']['id'];
+
         $riwayat = $this->model->getRiwayatByUser($id_user);
-        include 'view/riwayat.php'; // Data $riwayat akan otomatis terbaca di file ini
+        include 'view/riwayat.php';
     }
 }

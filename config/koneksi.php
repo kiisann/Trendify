@@ -5,14 +5,13 @@ $pass = "";
 $db   = "trendify";
 
 try {
-    // Kita buat objek PDO baru
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
     
-    // Set error mode ke exception supaya kalau ada typo di SQL langsung ketahuan
+    // Error handling
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    // Opsional: Untuk mysqli tetap ada jika file lama butuh (tapi di MVC pakai $pdo)
-    $conn = mysqli_connect($host, $user, $pass, $db); 
+    // Default fetch mode (biar ga ribet fetch array)
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     die("Koneksi database gagal: " . $e->getMessage());
