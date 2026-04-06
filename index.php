@@ -275,11 +275,11 @@ if ($page == 'home' && $_SESSION['user']['role'] == 'admin') {
             elseif($page == 'riwayat'){
                 $transaksiCtrl->tampilRiwayat();
             }
-            elseif($page == 'deadlock'){
-                include 'view/deadlock.php';
-            }
             elseif($page == 'checkout-selesai'){
                 $transaksiCtrl->tampilSelesai();
+            }
+            elseif($page == 'deadlock-result'){
+                $transaksiCtrl->tampilDeadlockResult();
             }
             else{
                 include 'view/home.php';

@@ -6,6 +6,7 @@ class DashboardAdminModel {
         $this->db = $pdo;
     }
 
+    // BUILT IN FUNCTION
     public function totalProduk() {
         return $this->db->query("SELECT COUNT(*) FROM produk")->fetchColumn();
     }

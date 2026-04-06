@@ -103,6 +103,12 @@ class TransaksiController {
 
         $id_user = $_SESSION['user']['id'];
         $metode = $_POST['metode_pembayaran'] ?? 'Transfer Bank';
+        $deadlockMode = isset($_POST['deadlock_mode']) ? 1 : 0;
+
+        if ($deadlockMode == 1) {
+            header("Location: ?page=deadlock-result&metode=" . urlencode($metode));
+            exit;
+        }
 
         $result = $this->model->prosesCheckoutTerpilih($id_user, $selectedIds);
 
@@ -114,6 +120,16 @@ class TransaksiController {
             header("Location: ?page=keranjang&status=gagal&msg=" . urlencode($result['message']));
         }
         exit;
+    }
+
+    public function tampilDeadlockResult() {
+        if (!isset($_SESSION['user'])) {
+            header("Location: ?page=login");
+            exit;
+        }
+
+        $metode = $_GET['metode'] ?? 'Transfer Bank';
+        include 'view/deadlock.php';
     }
 
     public function tampilSelesai() {

@@ -1,72 +1,43 @@
-<div class="checkout-success-page">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="success-card">
-                <div class="success-hero">
-                    <div class="success-icon-wrap">
-                        <div class="success-icon">✓</div>
+<div class="checkout-success-page fade-in">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-10">
+                <div class="success-card-main">
+                    
+                    <div class="success-icon-container">
+                        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="40" cy="40" r="40" fill="#F0FDF4"/>
+                            <path d="M56 28L34 50L24 40" stroke="#16A34A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
                     </div>
-                    <h1 class="success-title">Pembayaran Berhasil</h1>
-                    <p class="success-subtitle">
-                        Pesanan kamu sudah berhasil diproses dan tersimpan ke database.
-                    </p>
-                </div>
 
-                <div class="success-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <div class="info-box-icon purple-box">🧾</div>
-                                <div class="info-box-label">Status Pesanan</div>
-                                <div class="info-box-value">Selesai</div>
-                            </div>
+                    <div class="text-center">
+                        <h2 class="success-title">Payment Successful</h2>
+                        <p class="success-subtitle">Pesanan kamu sudah kami terima dan sedang diproses oleh sistem.</p>
+                    </div>
+
+                    <div class="detail-outer-box">
+                        <div class="detail-line">
+                            <span class="label">Metode Pembayaran</span>
+                            <span class="value">Transfer Bank</span>
                         </div>
-
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <div class="info-box-icon green-box">💳</div>
-                                <div class="info-box-label">Metode Pembayaran</div>
-                                <div class="info-box-value"><?= htmlspecialchars($metode); ?></div>
-                            </div>
+                        <div class="detail-line">
+                            <span class="label">Status Transaksi</span>
+                            <span class="value-status">SUCCESS</span>
                         </div>
-
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <div class="info-box-icon dark-box">🔒</div>
-                                <div class="info-box-label">Status Database</div>
-                                <div class="info-box-value text-success">COMMIT Berhasil</div>
-                            </div>
-                        </div>
+                        
+                        <!-- <div class="custom-divider"></div> -->
+                        
+                       
                     </div>
 
-                    <div class="success-message-box">
-                        <h5 class="fw-bold mb-2">Transaksi Selesai</h5>
-                        <p class="mb-0 text-muted">
-                            Sistem telah menyimpan data pesanan ke tabel <strong>pesanan</strong>,
-                            detail produk ke tabel <strong>detail_pesanan</strong>, memperbarui stok
-                            produk, lalu menyelesaikan proses menggunakan <strong>COMMIT</strong>.
-                        </p>
+                    <div class="button-stack">
+                        <a href="?page=riwayat" class="btn-trendify-primary">Lihat Riwayat Belanja</a>
+                        <a href="?page=produk" class="btn-trendify-secondary">Lanjut Belanja</a>
                     </div>
 
-                    <div class="next-step-box">
-                        <h6 class="fw-bold mb-3">Apa yang terjadi selanjutnya?</h6>
-                        <ul class="next-step-list">
-                            <li>Pesanan kamu sudah masuk ke halaman riwayat transaksi.</li>
-                            <li>Item yang sudah dibayar telah otomatis dihapus dari keranjang.</li>
-                            <li>Stok produk telah diperbarui sesuai jumlah pembelian.</li>
-                        </ul>
-                    </div>
-
-                    <div class="action-buttons">
-                        <a href="?page=riwayat" class="btn success-btn-dark">
-                            Lihat Riwayat
-                        </a>
-                        <a href="?page=produk" class="btn success-btn-primary">
-                            Belanja Lagi
-                        </a>
-                        <a href="?page=home" class="btn success-btn-light">
-                            Kembali ke Beranda
-                        </a>
+                    <div class="text-center mt-4">
+                        <a href="?page=home" class="btn-link-home">Kembali ke Beranda</a>
                     </div>
                 </div>
             </div>
@@ -75,214 +46,122 @@
 </div>
 
 <style>
-.checkout-success-page {
-    padding: 20px 0 40px;
-}
+    :root {
+        --t-purple: #c187db;
+        --t-dark: #222222;
+        --t-border: #f0f0f0;
+    }
 
-.success-card {
-    background: #fff;
-    border: none;
-    border-radius: 24px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-}
+    .checkout-success-page {
+        padding: 80px 0;
+        background-color: #fcfcfc;
+        min-height: 90vh;
+    }
 
-.success-hero {
-    background: linear-gradient(135deg, #111827, #374151);
-    color: #fff;
-    text-align: center;
-    padding: 50px 30px 42px;
-}
+    .success-card-main {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 50px 40px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        border: 1px solid var(--t-border);
+    }
 
-.success-icon-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 18px;
-}
-
-.success-icon {
-    width: 82px;
-    height: 82px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    font-weight: 700;
-    box-shadow: 0 10px 25px rgba(22, 163, 74, 0.35);
-}
-
-.success-title {
-    font-size: 2.3rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    letter-spacing: 0.5px;
-}
-
-.success-subtitle {
-    margin-bottom: 0;
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 1rem;
-}
-
-.success-body {
-    padding: 34px 34px 38px;
-}
-
-.info-box {
-    background: #fff;
-    border: 1px solid #eef0f3;
-    border-radius: 20px;
-    padding: 22px 20px;
-    text-align: center;
-    height: 100%;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-}
-
-.info-box-icon {
-    width: 52px;
-    height: 52px;
-    margin: 0 auto 12px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-}
-
-.purple-box {
-    background: #ede9fe;
-    color: #7c3aed;
-}
-
-.green-box {
-    background: #dcfce7;
-    color: #16a34a;
-}
-
-.dark-box {
-    background: #f3f4f6;
-    color: #111827;
-}
-
-.info-box-label {
-    font-size: 0.82rem;
-    color: #6b7280;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 600;
-}
-
-.info-box-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #111827;
-    word-break: break-word;
-}
-
-.success-message-box {
-    background: #faf5ff;
-    border: 1px solid rgba(167, 73, 255, 0.12);
-    border-radius: 20px;
-    padding: 22px 24px;
-    margin-bottom: 22px;
-}
-
-.success-message-box h5 {
-    color: #7c3aed;
-}
-
-.next-step-box {
-    background: #f9fafb;
-    border: 1px solid #eef0f3;
-    border-radius: 20px;
-    padding: 22px 24px;
-    margin-bottom: 28px;
-}
-
-.next-step-list {
-    margin: 0;
-    padding-left: 18px;
-    color: #6b7280;
-}
-
-.next-step-list li {
-    margin-bottom: 8px;
-}
-
-.next-step-list li:last-child {
-    margin-bottom: 0;
-}
-
-.action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-}
-
-.success-btn-dark,
-.success-btn-primary,
-.success-btn-light {
-    padding: 13px 22px;
-    border-radius: 16px;
-    font-weight: 600;
-    min-width: 170px;
-    transition: all 0.2s ease;
-}
-
-.success-btn-dark {
-    background: #111827;
-    color: #fff;
-    border: none;
-}
-
-.success-btn-dark:hover {
-    background: #1f2937;
-    color: #fff;
-}
-
-.success-btn-primary {
-    background: #a749ff;
-    color: #fff;
-    border: none;
-}
-
-.success-btn-primary:hover {
-    background: #9333ea;
-    color: #fff;
-}
-
-.success-btn-light {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    color: #374151;
-}
-
-.success-btn-light:hover {
-    background: #f9fafb;
-    color: #111827;
-}
-
-@media (max-width: 768px) {
-    .success-hero {
-        padding: 40px 20px 34px;
+    .success-icon-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 25px;
     }
 
     .success-title {
-        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--t-dark);
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
     }
 
-    .success-body {
-        padding: 24px 18px 28px;
+    .success-subtitle {
+        color: #777;
+        font-size: 0.95rem;
+        margin-bottom: 35px;
     }
 
-    .success-btn-dark,
-    .success-btn-primary,
-    .success-btn-light {
-        width: 100%;
+    .detail-outer-box {
+        background: #ffffff;
+        border: 1px solid var(--t-border);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 35px;
     }
-}
+
+    .detail-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.9rem;
+    }
+
+    .detail-line .label { color: #999; }
+    .detail-line .value { font-weight: 700; color: var(--t-dark); }
+    .value-status { color: #16a34a; font-weight: 800; font-size: 0.85rem; }
+
+    .custom-divider {
+        height: 1px;
+        background: var(--t-border);
+        margin: 18px 0;
+    }
+
+    .tech-description {
+        font-size: 0.8rem;
+        color: #aaa;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    .button-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-trendify-primary {
+        background: var(--t-dark);
+        color: #fff;
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+    .btn-trendify-secondary {
+        background: #fff;
+        color: var(--t-dark);
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 700;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+    .btn-trendify-primary:hover { background: #000; color: #fff; }
+    .btn-trendify-secondary:hover { background: #f9fafb; color: var(--t-dark); }
+
+    .btn-link-home {
+        color: var(--t-purple);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .fade-in {
+        animation: fadeInData 0.8s ease;
+    }
+
+    @keyframes fadeInData {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>

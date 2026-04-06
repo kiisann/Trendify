@@ -36,320 +36,275 @@ if ($hour >= 5 && $hour < 12) {
 ?>
 
 <style>
-    .login-page * {
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
+    /* CSS Variables berdasarkan Palette baru */
+    :root {
+        --primary-purple: #8B5CF6; /* Warna utama tombol */
+        --dark-text: #111111;
+        --border-color: #E5E7EB;
+        --input-placeholder: #9CA3AF;
+        --shadow: 0 10px 40px rgba(17, 17, 17, 0.1);
     }
 
-    .login-page {
-        --bg: #f5f5f7;
-        --card: #ffffff;
-        --text: #111111;
-        --muted: #6b7280;
-        --line: #e5e7eb;
-        --accent: #8b5cf6;
-        --accent-soft: #f3f0ff;
-        --danger: #dc2626;
-        --danger-bg: #fef2f2;
-        --shadow: 0 20px 50px rgba(17, 17, 17, 0.08);
-
-        min-height: 100vh;
-        width: 100%;
-        background: var(--bg);
+    body {
+        background-color: #ffffff;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
         display: flex;
-        align-items: center;
         justify-content: center;
-        padding: 32px;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+        align-items: center;
+        min-height: 100vh;
     }
 
     .login-shell {
-        width: 100%;
-        max-width: 1240px;
-        min-height: 700px;
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 28px;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        max-width: 1200px;
+        background: #ffffff;
+        border-radius: 20px;
         overflow: hidden;
         box-shadow: var(--shadow);
     }
 
+    /* Sisi Kiri  */
     .login-left {
-        padding: 72px;
+        background: radial-gradient(circle at 5% 10%, #edddf3 0%, rgba(255,255,255,0) 30%),
+                    radial-gradient(circle at 80% 80%, #bb90d2 0%, rgba(255,255,255,0) 40%),
+                    radial-gradient(circle at 90% 40%, #e7e6ee 0%, rgba(255,255,255,0) 40%);
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        background: #ffffff;
+        justify-content: space-between;
+        padding: 60px;
+        color: white;
     }
 
-    .login-brand {
-        font-size: 2.15rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        margin-bottom: 28px;
-        color: var(--text);
-    }
-
-    .login-brand span {
-        color: var(--accent);
-    }
-
-    .login-badge {
-        display: inline-flex;
+    .login-brand-group {
+        display: flex;
         align-items: center;
-        width: fit-content;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        margin-bottom: 26px;
+        gap: 15px;
     }
 
-    .login-left h1 {
-        font-size: 3.6rem;
-        line-height: 1.05;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        margin-bottom: 18px;
-        color: var(--text);
-        max-width: 500px;
-    }
-
-    .login-left p {
-        max-width: 560px;
-        color: var(--muted);
-        line-height: 1.9;
-        font-size: 1.05rem;
-        font-weight: 400;
-    }
-
-    .login-right {
-        background: #fafafa;
-        border-left: 1px solid var(--line);
+    .brand-logo-placeholder {
+        font-size: 2rem;
+        font-weight: 800;
+        background: #f6f6f6;
+        color: var(--primary-purple);
+        width: 60px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 44px;
+        border-radius: 20px;
+        shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        
+    }
+
+    .brand-text h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .brand-text p {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+
+    .welcome-text h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -2px;
+        margin-bottom: 20px;
+    }
+
+    /* Sisi Kanan - Clean Form */
+    .login-right {
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 60px;
     }
 
     .login-card {
         width: 100%;
-        max-width: 470px;
-        background: #ffffff;
-        border: 1px solid var(--line);
-        border-radius: 24px;
-        padding: 40px;
-    }
-
-    .login-mini {
-        font-size: 0.72rem;
-        color: var(--accent);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        margin-bottom: 12px;
+        max-width: 400px;
     }
 
     .login-card h2 {
-        font-size: 2.65rem;
-        line-height: 1.05;
-        margin-bottom: 12px;
-        color: var(--text);
         font-weight: 700;
-        letter-spacing: -0.02em;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: var(--dark-text);
     }
 
-    .login-card p {
-        color: var(--muted);
-        font-size: 0.96rem;
-        line-height: 1.75;
-        margin-bottom: 24px;
-        max-width: 320px;
+    .login-mini-desc {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 40px;
     }
 
     .login-error {
-        margin-bottom: 18px;
-        padding: 14px 16px;
-        border-radius: 14px;
-        border: 1px solid #fecaca;
-        background: var(--danger-bg);
-        color: var(--danger);
-        font-size: 0.9rem;
+        background-color: #FEF2F2;
+        color: #DC2626;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+        border: 1px solid #FEE2E2;
     }
 
     .login-field {
-        margin-bottom: 18px;
+        margin-bottom: 20px;
     }
 
     .login-label {
         display: block;
-        font-size: 0.86rem;
+        font-size: 0.85rem;
         font-weight: 600;
         margin-bottom: 8px;
-        letter-spacing: 0.02em;
-        color: #374151;
+        color: var(--dark-text);
     }
 
     .login-input {
         width: 100%;
-        height: 56px;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        background: #fff;
-        padding: 0 16px;
-        font-size: 0.95rem;
-        color: var(--text);
-        transition: 0.2s ease;
+        padding: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background-color: #fff;
+        font-size: 1rem;
+        transition: 0.3s;
     }
 
     .login-input::placeholder {
-        color: #9ca3af;
+        color: var(--input-placeholder);
     }
 
     .login-input:focus {
         outline: none;
-        border-color: var(--accent);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.10);
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 4px #F5F3FF;
+    }
+
+    .btn-row {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
     }
 
     .login-btn {
         width: 100%;
-        height: 56px;
+        padding: 16px;
+        background-color: #8c7ace;
+        color: white;
         border: none;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #8b5cf6, #6d47d9);
-        color: #fff;
-        font-size: 0.9rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.1rem;
         cursor: pointer;
-        margin-top: 8px;
-        transition: 0.2s ease;
+        transition: 0.3s;
+        box-shadow: 0 5px 20px rgba(139, 92, 246, 0.2);
     }
 
     .login-btn:hover {
-        transform: translateY(-1px);
-        opacity: 0.97;
+        background-color: #8166b1;
+        transform: translateY(-2px);
     }
 
-    .login-note {
-        margin-top: 20px;
+    .extra-links {
+        font-size: 0.85rem;
+        color: #888;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .extra-links a {
+        color: var(--primary-purple);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .system-footnote {
         text-align: center;
-        color: var(--muted);
-        font-size: 0.84rem;
+        font-size: 0.75rem;
+        color: #aaa;
+        margin-top: 60px;
+        letter-spacing: 1px;
     }
 
+    /* Responsive */
     @media (max-width: 992px) {
-        .login-shell {
-            grid-template-columns: 1fr;
-            max-width: 760px;
-            min-height: auto;
-        }
-
-        .login-left {
-            padding: 42px 30px 24px;
-        }
-
-        .login-left h1 {
-            font-size: 2.4rem;
-            max-width: 100%;
-        }
-
-        .login-left p {
-            max-width: 100%;
-            font-size: 1rem;
-        }
-
-        .login-right {
-            border-left: none;
-            border-top: 1px solid var(--line);
-            padding: 26px;
-        }
-
-        .login-card {
-            max-width: 100%;
-        }
+        .login-shell { grid-template-columns: 1fr; border-radius: 0; }
+        .login-left { display: none; }
+        body { background: #fff; }
     }
 
-    @media (max-width: 576px) {
-        .login-page {
-            padding: 16px;
-        }
-
-        .login-left,
-        .login-right {
-            padding: 22px;
-        }
-
-        .login-card {
-            padding: 24px 20px;
-        }
-
-        .login-brand {
-            font-size: 1.5  rem;
-        }
-
-        .login-left h1 {
-            font-size: 2rem;
-        }
-
-        .login-card h2 {
-            font-size: 2rem;
-        }
-
-        .login-card p {
-            max-width: 100%;
-        }
+    .welcome-text p {
+        color: #824a9c;
+        font-size: 1rem;
+        margin-top: 10px;
     }
+    .welcome-text h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -2px;
+        margin-bottom: 20px;
+        color: var(--dark-text);
+        padding: 0;
+
+    }
+    
 </style>
 
-<div class="login-page">
-    <div class="login-shell">
-        <section class="login-left">
-            <div class="login-brand">TRENDIFY<span>.</span></div>
-            <div class="login-badge"><?php echo $greeting; ?></div>
-            <h1>Trendify System</h1>
-            <p>
-                Sistem manajemen fashion berbasis database untuk mengelola produk,
-                transaksi, dan pengguna dengan lebih terstruktur.
-            </p>
-        </section>
+<div class="login-shell">
+    <section class="login-left"> 
+        <div class="welcome-text">
+            <h1>Welcome <br> Back!</h1>
+            <p style="font-size: 1rem; opacity: 0.9; margin-top: 20px;"><?php echo $greeting; ?> - Trendify</p>
+        </div>
+    </section>
 
-        <section class="login-right">
-            <div class="login-card">
-                <div class="login-mini">Welcome Back</div>
-                <h2>Sign in</h2>
-                <p>Masukkan email dan password untuk melanjutkan.</p>
+    <section class="login-right">
+        <div class="login-card">
+            <h2>Login</h2>
+            <p class="login-mini-desc">Welcome back! Discover the best distributed fashion management system.</p>
 
-                <?php if ($error): ?>
-                    <div class="login-error">Email atau password salah.</div>
-                <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="login-error">Email atau password salah, coba cek lagi ya.</div>
+            <?php endif; ?>
 
-                <form method="POST" action="">
-                    <div class="login-field">
-                        <label class="login-label">Email</label>
-                        <input type="email" name="email" class="login-input" placeholder="Enter your email" required>
+            <form method="POST" action="">
+                <div class="login-field">
+                    <label class="login-label">Email Address / Username</label>
+                    <input type="email" name="email" class="login-input" placeholder="name@example.com" required>
+                </div>
+
+                <div class="login-field">
+                    <label class="login-label">Password</label>
+                    <input type="password" name="password" class="login-input" placeholder="Enter your password" required>
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="login-btn">Sign In to Dashboard</button>
+                    
+                    <div class="extra-links">
+                        <label style="display: flex; gap: 8px; align-items: center; color: #666; font-weight: 500;">
+                            <input type="checkbox" style="accent-color: var(--primary-purple);"> Remember Me
+                        </label>
+                        <a href="#">Forgot Password?</a>
                     </div>
+                </div>
 
-                    <div class="login-field">
-                        <label class="login-label">Password</label>
-                        <input type="password" name="password" class="login-input" placeholder="Enter your password" required>
-                    </div>
-
-                    <button type="submit" class="login-btn">Login</button>
-
-                    <div class="login-note">
-                        TRENDIFY © <?php echo date('Y'); ?>
-                    </div>
-                </form>
-            </div>
-        </section>
-    </div>
+                <div class="system-footnote">
+                     © <?php echo date('Y'); ?> Trendify Fashion.
+                </div>
+            </form>
+        </div>
+    </section>
 </div>

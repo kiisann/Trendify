@@ -16,18 +16,22 @@ class ProdukController {
     }
 
     public function prosesTambah() {
-        if (isset($_POST['simpan'])) {
-            $nama = $_POST['nama'];
-            $harga = $_POST['harga'];
-            $stok = $_POST['stok'];
-            $id_kategori = $_POST['id_kategori'];
+    if (isset($_POST['simpan'])) {
+        $nama = $_POST['nama'];
+        $harga = $_POST['harga'];
+        $stok = $_POST['stok'];
+        $id_kategori = $_POST['id_kategori'];
+        $gambar = $_FILES['gambar']['name'];
+        $tmp = $_FILES['gambar']['tmp_name'];
+        
+        move_uploaded_file($tmp, "assets/img/".$gambar);
 
-            if ($this->model->tambah($nama, $harga, $stok, $id_kategori)) {
-                header("Location: ?page=produk&status=success");
-                exit();
-            }
+        if ($this->model->tambah($nama, $harga, $stok, $id_kategori, $gambar)) {
+            header("Location: ?page=produk&status=success");
+            exit();
         }
     }
+}
 
     public function prosesHapus($id) {
         if ($this->model->hapus($id)) {

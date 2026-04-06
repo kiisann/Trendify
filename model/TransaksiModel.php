@@ -16,19 +16,14 @@ class TransaksiModel {
     return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // VIEW TRANSAKSI USER
     public function getRiwayatByUser($id_user) {
-        $sql = "SELECT 
-                    p.tanggal,
-                    pr.nama AS nama_produk,
-                    dp.jumlah,
-                    pr.harga,
-                    hitung_total(dp.jumlah, pr.harga) AS total,
-                    p.status
-                FROM pesanan p
-                JOIN detail_pesanan dp ON p.id_pesanan = dp.id_pesanan
-                JOIN produk pr ON dp.id_produk = pr.id_produk
-                WHERE p.id_user = :id_user
-                ORDER BY p.tanggal DESC";
+        $sql = "
+            SELECT *
+            FROM view_transaksi
+            WHERE id_user = :id_user
+            ORDER BY tanggal DESC, id_pesanan DESC
+        ";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id_user' => $id_user]);
@@ -42,6 +37,7 @@ class TransaksiModel {
                     p.nama,
                     p.harga,
                     p.stok,
+                    p.gambar,
                     k.jumlah,
                     hitung_total(k.jumlah, p.harga) AS subtotal
                 FROM keranjang k
@@ -77,6 +73,7 @@ class TransaksiModel {
             p.nama,
             p.harga,
             p.stok,
+            p.gambar,
             k.jumlah,
             hitung_total(k.jumlah, p.harga) AS subtotal
         FROM keranjang k

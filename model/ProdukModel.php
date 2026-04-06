@@ -13,6 +13,7 @@ class ProdukModel {
         return $data;
     }
 
+    // UNION
     public function getRekomendasi() {
         $sql = "SELECT p.nama, p.harga, 'Pria' AS kategori
                 FROM produk p
@@ -28,12 +29,12 @@ class ProdukModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function tambah($nama, $harga, $stok, $id_kategori) {
-        $stmt = $this->db->prepare("CALL insert_produk(?, ?, ?, ?)");
-        $result = $stmt->execute([$nama, $harga, $stok, $id_kategori]);
-        $stmt->closeCursor();
-        return $result;
-    }
+    public function tambah($nama, $harga, $stok, $id_kategori, $gambar) {
+    $stmt = $this->db->prepare("CALL insert_produk(?, ?, ?, ?, ?)");
+    $result = $stmt->execute([$nama, $harga, $stok, $id_kategori, $gambar]);
+    $stmt->closeCursor();
+    return $result;
+}
 
     public function ubah($id, $nama, $harga, $stok) {
         $stmt = $this->db->prepare("CALL update_produk(?, ?, ?, ?)");
