@@ -1,7 +1,96 @@
-<?php 
-session_start();    
+<?php
+ob_start();
+session_start();
 
-include 'config/koneksi.php'; 
+include 'config/koneksi.php';
+
+// ================== AJAX UPDATE QTY ==================
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['ajax']) &&
+    isset($_GET['page']) &&
+    $_GET['page'] === 'keranjang'
+) {
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    try {
+        $id = (int) ($_POST['id'] ?? 0);
+        $aksi = $_POST['aksi'] ?? '';
+
+        if ($id <= 0 || !in_array($aksi, ['tambah', 'kurang'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Parameter tidak valid'
+            ]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT k.id_keranjang, k.id_produk, k.jumlah, p.harga
+            FROM keranjang k
+            JOIN produk p ON p.id_produk = k.id_produk
+            WHERE k.id_keranjang = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$id]);
+        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$item) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Item tidak ditemukan'
+            ]);
+            exit;
+        }
+
+        $qty = (int) $item['jumlah'];
+
+        if ($aksi === 'tambah') {
+            $qty++;
+        } else {
+            $qty--;
+        }
+
+        if ($qty <= 0) {
+            $delete = $pdo->prepare("DELETE FROM keranjang WHERE id_keranjang = ?");
+            $delete->execute([$id]);
+
+            echo json_encode([
+                'success' => true,
+                'deleted' => true
+            ]);
+            exit;
+        }
+
+        $update = $pdo->prepare("
+            UPDATE keranjang
+            SET jumlah = ?
+            WHERE id_keranjang = ?
+        ");
+        $update->execute([$qty, $id]);
+
+        $subtotal = $qty * (int) $item['harga'];
+
+        echo json_encode([
+            'success' => true,
+            'deleted' => false,
+            'qty' => $qty,
+            'subtotal' => $subtotal,
+            'subtotal_format' => 'Rp ' . number_format($subtotal, 0, ',', '.')
+        ]);
+        exit;
+
+    } catch (Throwable $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+        exit;
+    }
+}
+// =====================================================
+
 // Estafet Koneksi PDO ke Controller & Model
 include_once 'model/TransaksiModel.php';
 include_once 'controller/TransaksiController.php';
@@ -22,7 +111,6 @@ $dashboardCtrl = new DashboardAdminController($pdo);
 $produkAdminCtrl = new ProdukAdminController($pdo);
 
 // Menangani logic router
-// $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 $page = $_GET['page'] ?? 'login';
 
 // HANDLE LOGIN
@@ -52,7 +140,7 @@ if ($page == 'produk-admin' && isset($_GET['id'])) {
     $produkAdminCtrl->delete();
 }
 
-//KERANJANG
+// KERANJANG
 if ($page == 'tambah-keranjang' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $produkCtrl->tambahKeKeranjang();
     exit;
@@ -63,6 +151,7 @@ if ($page == 'hapus-keranjang' && isset($_GET['id'])) {
     exit;
 }
 
+// route lama tetap dipertahankan
 if ($page == 'ubah_qty' && isset($_GET['id']) && isset($_GET['aksi'])) {
     $transaksiCtrl->ubahQty();
     exit;
@@ -115,6 +204,7 @@ if ($page == 'home' && $_SESSION['user']['role'] == 'admin') {
     <title>Trendify | PDT Project</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
         :root {
@@ -229,11 +319,9 @@ if ($page == 'home' && $_SESSION['user']['role'] == 'admin') {
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
             <ul class="navbar-nav">
             <?php if ($_SESSION['user']['role'] == 'admin'): ?>
-                <!-- ADMIN -->
                 <li class="nav-item"><a class="nav-link <?= ($page == 'dashboard') ? 'active' : '' ?>" href="?page=dashboard">DASHBOARD</a></li>
                 <li class="nav-item"><a class="nav-link <?= ($page == 'produk-admin') ? 'active' : '' ?>" href="?page=produk-admin">PRODUK</a></li>
             <?php else: ?>
-                <!-- USER -->
                 <li class="nav-item"><a class="nav-link <?= ($page == 'home') ? 'active' : '' ?>" href="?page=home">BERANDA</a></li>
                 <li class="nav-item"><a class="nav-link <?= ($page == 'produk') ? 'active' : '' ?>" href="?page=produk">PRODUCT</a></li>
                 <li class="nav-item"><a class="nav-link <?= ($page == 'keranjang') ? 'active' : '' ?>" href="?page=keranjang">KERANJANG</a></li>
@@ -285,6 +373,9 @@ if ($page == 'home' && $_SESSION['user']['role'] == 'admin') {
             }
             elseif($page == 'deadlock-result'){
                 $transaksiCtrl->tampilDeadlockResult();
+            }
+            elseif($page == 'tracking'){
+                $transaksiCtrl->tampilTracking();
             }
             else{
                 include 'view/home.php';
