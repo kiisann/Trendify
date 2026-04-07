@@ -60,15 +60,24 @@
         <?php
         if (!empty($data_union)) {
             foreach ($data_union as $row) {
+                $img_rec = !empty($row['gambar']) ? "assets/img/" . $row['gambar'] : "assets/img/default.jpg";
         ?>
             <div class="col-md-4">
                 <div class="recommend-card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="fw-bold mb-0" style="font-size: 0.9rem;"><?= htmlspecialchars($row['nama']); ?></h6>
-                            <small class="text-purple fw-bold">Rp <?= number_format($row['harga'], 0, ',', '.'); ?></small>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3" style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; background: #f3f4f6; flex-shrink: 0;">
+                            <img src="<?= $img_rec; ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='assets/img/default.jpg'">
                         </div>
-                        <span class="badge bg-purple-soft text-purple" style="font-size: 0.6rem;">NEW</span>
+                        
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-0" style="font-size: 0.85rem;"><?= htmlspecialchars($row['nama']); ?></h6>
+                                    <small class="text-purple fw-bold">Rp <?= number_format($row['harga'], 0, ',', '.'); ?></small>
+                                </div>
+                                <span class="badge bg-purple-soft text-purple" style="font-size: 0.55rem;">NEW</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -80,11 +89,11 @@
     </div>
 
     <div class="mt-5 mb-5">
-        </div>
     </div>
 </div>
 
 <style>
+    /* Style tetap sama sesuai permintaan */
     .product-card {
         background: #fff;
         border: 1px solid #eee;

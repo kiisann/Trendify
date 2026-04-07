@@ -7,16 +7,16 @@ class TransaksiModel {
     }
 
     public function getUserById($id_user) {
-    $stmt = $this->db->prepare("
-        SELECT id_user, nama, email, alamat
-        FROM user
-        WHERE id_user = ?
-    ");
-    $stmt->execute([$id_user]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->db->prepare("
+            SELECT id_user, nama, email, alamat
+            FROM user
+            WHERE id_user = ?
+        ");
+        $stmt->execute([$id_user]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Penerapan View 
+    // VIEW TRANSAKSI USER
     public function getRiwayatByUser($id_user) {
         $sql = "
             SELECT *
@@ -30,8 +30,6 @@ class TransaksiModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Penerapan Custom Function
-    // Penerapan Inner Join 2 Tabel Keranjang dan Produk
     public function getKeranjangByUser($id_user) {
         $sql = "SELECT 
                     k.id_keranjang,
@@ -69,7 +67,7 @@ class TransaksiModel {
 
         $jumlahBaru = $data['jumlah'];
         if ($aksi == 'tambah') {
-            $jumlahBaru++; // Langsung tambah tanpa cek stok database di sini
+            $jumlahBaru++; 
         } elseif ($aksi == 'kurang' && $data['jumlah'] > 1) {
             $jumlahBaru--;
         }
@@ -79,82 +77,65 @@ class TransaksiModel {
     }
 
     public function getSelectedKeranjangItems($id_user, $selectedIds) {
-    if (empty($selectedIds)) {
-        return [];
+        if (empty($selectedIds)) return [];
+
+        $selectedIds = array_map('intval', $selectedIds);
+        $placeholders = implode(',', array_fill(0, count($selectedIds), '?'));
+
+        $sql = "
+            SELECT 
+                k.id_keranjang,
+                k.id_produk,
+                p.nama,
+                p.harga,
+                p.stok,
+                p.gambar,
+                k.jumlah,
+                hitung_total(k.jumlah, p.harga) AS subtotal
+            FROM keranjang k
+            JOIN produk p ON k.id_produk = p.id_produk
+            WHERE k.id_user = ?
+            AND k.id_keranjang IN ($placeholders)
+            ORDER BY k.id_keranjang DESC
+        ";
+
+        $params = array_merge([$id_user], $selectedIds);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    $selectedIds = array_map('intval', $selectedIds);
-    $placeholders = implode(',', array_fill(0, count($selectedIds), '?'));
-
-    $sql = "
-        SELECT 
-            k.id_keranjang,
-            k.id_produk,
-            p.nama,
-            p.harga,
-            p.stok,
-            p.gambar,
-            k.jumlah,
-            hitung_total(k.jumlah, p.harga) AS subtotal
-        FROM keranjang k
-        JOIN produk p ON k.id_produk = p.id_produk
-        WHERE k.id_user = ?
-        AND k.id_keranjang IN ($placeholders)
-        ORDER BY k.id_keranjang DESC
-    ";
-
-    $params = array_merge([$id_user], $selectedIds);
-
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute($params);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    
     public function prosesCheckoutTerpilih($id_user, $selectedIds) {
         if (empty($selectedIds)) {
-            return [
-                'status' => false,
-                'message' => 'Pilih minimal satu item untuk checkout'
-            ];
+            return ['status' => false, 'message' => 'Pilih minimal satu item untuk checkout'];
         }
 
         try {
-            $this->db->beginTransaction(); // BEGIN
+            $this->db->beginTransaction();
 
             $selectedIds = array_map('intval', $selectedIds);
             $placeholders = implode(',', array_fill(0, count($selectedIds), '?'));
 
             $sql = "
-                SELECT 
-                    k.id_keranjang,
-                    k.id_produk,
-                    k.jumlah,
-                    p.nama,
-                    p.harga,
-                    p.stok
+                SELECT k.id_keranjang, k.id_produk, k.jumlah, p.nama, p.harga, p.stok
                 FROM keranjang k
                 JOIN produk p ON k.id_produk = p.id_produk
-                WHERE k.id_user = ?
-                AND k.id_keranjang IN ($placeholders)
+                WHERE k.id_user = ? AND k.id_keranjang IN ($placeholders)
             ";
 
             $params = array_merge([$id_user], $selectedIds);
-
             $stmtItems = $this->db->prepare($sql);
             $stmtItems->execute($params);
             $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-            if (empty($items)) {
-                throw new Exception("Item keranjang tidak ditemukan");
-            }
+            if (empty($items)) throw new Exception("Item keranjang tidak ditemukan");
 
+            // DISINI PERBAIKANNYA: Status diatur ke 'dikemas'
             $stmtPesanan = $this->db->prepare("
                 INSERT INTO pesanan (id_user, tanggal, status)
-                VALUES (?, CURDATE(), 'selesai')
+                VALUES (?, CURDATE(), 'dikemas')
             ");
             $stmtPesanan->execute([$id_user]);
-
             $id_pesanan = $this->db->lastInsertId();
 
             $stmtDetail = $this->db->prepare("
@@ -163,58 +144,31 @@ class TransaksiModel {
             ");
 
             $stmtUpdateStok = $this->db->prepare("
-                UPDATE produk
-                SET stok = stok - ?
-                WHERE id_produk = ?
+                UPDATE produk SET stok = stok - ? WHERE id_produk = ?
             ");
 
             foreach ($items as $item) {
                 if ($item['stok'] < $item['jumlah']) {
-                    throw new Exception("Stok produk '{$item['nama']}' tidak cukup. Tersisa: {$item['stok']}");
+                    throw new Exception("Stok produk '{$item['nama']}' tidak cukup.");
                 }
 
-                $stmtDetail->execute([
-                    $id_pesanan,
-                    $item['id_produk'],
-                    $item['jumlah']
-                ]);
-
-                $stmtUpdateStok->execute([
-                    $item['jumlah'],
-                    $item['id_produk']
-                ]);
+                $stmtDetail->execute([$id_pesanan, $item['id_produk'], $item['jumlah']]);
+                $stmtUpdateStok->execute([$item['jumlah'], $item['id_produk']]);
             }
 
             $selectedKeranjangIds = array_column($items, 'id_keranjang');
             $deletePlaceholders = implode(',', array_fill(0, count($selectedKeranjangIds), '?'));
-
-            $sqlDelete = "
-                DELETE FROM keranjang
-                WHERE id_user = ?
-                AND id_keranjang IN ($deletePlaceholders)
-            ";
-
-            $deleteParams = array_merge([$id_user], $selectedKeranjangIds);
-
+            $sqlDelete = "DELETE FROM keranjang WHERE id_user = ? AND id_keranjang IN ($deletePlaceholders)";
+            
             $stmtDelete = $this->db->prepare($sqlDelete);
-            $stmtDelete->execute($deleteParams);
+            $stmtDelete->execute(array_merge([$id_user], $selectedKeranjangIds));
 
-            $this->db->commit(); // COMMIT
+            $this->db->commit();
+            return ['status' => true, 'message' => 'Transaksi berhasil'];
 
-            return [
-                'status' => true,
-                'message' => 'Transaksi berhasil'
-            ];
         } catch (Exception $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack(); // ROLLBACK
-            }
-
-            return [
-                'status' => false,
-                'message' => 'Transaksi gagal: ' . $e->getMessage()
-            ];
+            if ($this->db->inTransaction()) $this->db->rollBack();
+            return ['status' => false, 'message' => $e->getMessage()];
         }
     }
 }
-?>

@@ -51,41 +51,35 @@ class TransaksiController {
     }
 
     public function tampilPayment() {
-    if (!isset($_SESSION['user'])) {
-        header("Location: ?page=login");
-        exit;
-    }
+        if (!isset($_SESSION['user'])) {
+            header("Location: ?page=login");
+            exit;
+        }
 
-    $selectedIds = $_POST['pilih_item'] ?? [];
+        $selectedIds = $_POST['pilih_item'] ?? [];
 
-    if (empty($selectedIds)) {
-        header("Location: ?page=keranjang&status=gagal&msg=" . urlencode("Pilih minimal satu produk untuk checkout."));
-        exit;
-    }
+        if (empty($selectedIds)) {
+            header("Location: ?page=keranjang&status=gagal&msg=" . urlencode("Pilih minimal satu produk untuk checkout."));
+            exit;
+        }
 
-    $id_user = $_SESSION['user']['id'];
+        $id_user = $_SESSION['user']['id'];
+        $_SESSION['checkout_items'] = array_map('intval', $selectedIds);
 
-    $_SESSION['checkout_items'] = array_map('intval', $selectedIds);
+        $items = $this->model->getSelectedKeranjangItems($id_user, $_SESSION['checkout_items']);
+        $userData = $this->model->getUserById($id_user);
 
-    $items = $this->model->getSelectedKeranjangItems($id_user, $_SESSION['checkout_items']);
-    $userData = $this->model->getUserById($id_user);
+        if (empty($items) || !$userData) {
+            header("Location: ?page=keranjang&status=gagal&msg=" . urlencode("Data tidak ditemukan."));
+            exit;
+        }
 
-    if (empty($items)) {
-        header("Location: ?page=keranjang&status=gagal&msg=" . urlencode("Item checkout tidak ditemukan."));
-        exit;
-    }
+        $grandTotal = 0;
+        foreach ($items as $item) {
+            $grandTotal += $item['subtotal'];
+        }
 
-    if (!$userData) {
-        header("Location: ?page=keranjang&status=gagal&msg=" . urlencode("Data user tidak ditemukan."));
-        exit;
-    }
-
-    $grandTotal = 0;
-    foreach ($items as $item) {
-        $grandTotal += $item['subtotal'];
-    }
-
-    include 'view/checkout.php';
+        include 'view/checkout.php';
     }
 
     public function ubahQty() {
@@ -99,7 +93,6 @@ class TransaksiController {
         $aksi = $_GET['aksi'] ?? ''; 
 
         $this->model->updateQtyKeranjang($id_keranjang, $id_user, $aksi);
-        
         header("Location: ?page=keranjang");
         exit;
     }
@@ -111,7 +104,6 @@ class TransaksiController {
         }
 
         $selectedIds = $_SESSION['checkout_items'] ?? [];
-
         if (empty($selectedIds)) {
             header("Location: ?page=keranjang&status=gagal&msg=" . urlencode("Tidak ada item checkout."));
             exit;
@@ -122,7 +114,6 @@ class TransaksiController {
         $deadlockMode = isset($_POST['deadlock_mode']) ? 1 : 0;
 
         $result = $this->model->prosesCheckoutTerpilih($id_user, $selectedIds);
-
         unset($_SESSION['checkout_items']);
 
         if ($deadlockMode == 1) {
@@ -143,7 +134,6 @@ class TransaksiController {
             header("Location: ?page=login");
             exit;
         }
-
         $metode = $_GET['metode'] ?? 'Transfer Bank';
         include 'view/deadlock.php';
     }
@@ -153,9 +143,35 @@ class TransaksiController {
             header("Location: ?page=login");
             exit;
         }
-
         $metode = $_GET['metode'] ?? 'Transfer Bank';
         include 'view/CheckoutSelesai.php';
+    }
+
+    public function tampilTracking() {
+        if (!isset($_SESSION['user'])) {
+            header("Location: ?page=login");
+            exit;
+        }
+
+        $id_user = $_SESSION['user']['id'];
+        // Pastikan variabel ini konsisten
+        $id_cari = $_GET['id'] ?? '';
+
+        $riwayat = $this->model->getRiwayatByUser($id_user);
+
+        $data_detail = null;
+        if (!empty($riwayat)) {
+            foreach ($riwayat as $r) {
+                // SESUAIKAN: Gunakan 'id_pesanan' sesuai View di database kamu
+                // Gunakan variabel $id_cari yang sudah didefinisikan di atas
+                if ($r['id_pesanan'] == $id_cari) {
+                    $data_detail = $r;
+                    break;
+                }
+            }
+        }
+
+        include 'view/tracking.php';
     }
 }
 ?>
