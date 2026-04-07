@@ -63,6 +63,11 @@ if ($page == 'hapus-keranjang' && isset($_GET['id'])) {
     exit;
 }
 
+if ($page == 'ubah_qty' && isset($_GET['id']) && isset($_GET['aksi'])) {
+    $transaksiCtrl->ubahQty();
+    exit;
+}
+
 if ($page == 'checkout' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $transaksiCtrl->tampilPayment();
     exit;

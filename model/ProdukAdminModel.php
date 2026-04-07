@@ -6,12 +6,12 @@ class ProdukAdminModel {
         $this->db = $pdo;
     }
 
-    // ALL PRODUK (SELECT)
+    // SELECT PRODUK (Stored Procedure)
     public function getAll() {
-        $sql = "SELECT * FROM view_produk ORDER BY id_produk DESC";
-        $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $sql = "CALL select_produk()"; 
+    $stmt = $this->db->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     // INSERT PRODUK (Stored Procedure)
     public function insert($nama, $harga, $gambar, $stok, $id_kategori) {

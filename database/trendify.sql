@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 06, 2026 at 11:14 PM
+-- Generation Time: Apr 07, 2026 at 12:37 AM
 -- Server version: 8.0.30
--- PHP Version: 8.3.26
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `trendify0`
+-- Database: `trendify`
 --
 
 DELIMITER $$
@@ -35,7 +35,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_produk` (IN `p_nama` VARCHAR
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `select_produk` ()   BEGIN
-    SELECT * FROM view_produk;
+    SELECT * FROM view_produk ORDER BY id_produk DESC;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `update_produk` (IN `p_id` INT, IN `p_nama` VARCHAR(100), IN `p_harga` INT, IN `p_stok` INT, IN `p_id_kategori` INT)   BEGIN
@@ -101,7 +101,11 @@ INSERT INTO `detail_pesanan` (`id_detail`, `id_pesanan`, `id_produk`, `jumlah`) 
 (25, 21, 13, 1),
 (26, 22, 13, 1),
 (27, 23, 3, 1),
-(28, 24, 13, 3);
+(28, 24, 13, 3),
+(29, 27, 2, 2),
+(30, 27, 6, 5),
+(31, 29, 12, 3),
+(32, 30, 12, 1);
 
 -- --------------------------------------------------------
 
@@ -144,8 +148,9 @@ CREATE TABLE `keranjang` (
 --
 
 INSERT INTO `keranjang` (`id_keranjang`, `id_user`, `id_produk`, `jumlah`) VALUES
-(13, 4, 2, 6),
-(14, 4, 6, 1);
+(24, 3, 3, 3),
+(26, 4, 3, 2),
+(27, 4, 8, 1);
 
 -- --------------------------------------------------------
 
@@ -187,7 +192,10 @@ INSERT INTO `pesanan` (`id_pesanan`, `id_user`, `tanggal`, `status`) VALUES
 (21, 4, '2026-04-07 00:00:00', 'selesai'),
 (22, 4, '2026-04-07 00:00:00', 'selesai'),
 (23, 4, '2026-04-07 00:00:00', 'selesai'),
-(24, 4, '2026-04-07 00:00:00', 'selesai');
+(24, 4, '2026-04-07 00:00:00', 'selesai'),
+(27, 4, '2026-04-07 00:00:00', 'selesai'),
+(29, 4, '2026-04-07 00:00:00', 'selesai'),
+(30, 4, '2026-04-07 00:00:00', 'selesai');
 
 -- --------------------------------------------------------
 
@@ -210,14 +218,14 @@ CREATE TABLE `produk` (
 
 INSERT INTO `produk` (`id_produk`, `nama`, `harga`, `gambar`, `stok`, `id_kategori`) VALUES
 (1, 'Kaos Polos Pria', 50000, 'kaos.jpg', 4, 1),
-(2, 'Hoodie Pria', 120000, 'hodie.jpg', 2, 1),
+(2, 'Hoodie Pria', 120000, 'hodie.jpg', 0, 1),
 (3, 'Sepatu Sneakers Pria', 250000, 'sneakers.jpg', 1, 2),
 (4, 'Jam Tangan Pria', 150000, 'jam.jpg', 4, 3),
 (5, 'Dress Wanita', 150000, 'dress.jpg', 5, 4),
-(6, 'Blouse Wanita', 90000, 'blouse.jpg', 5, 4),
+(6, 'Blouse Wanita', 90000, 'blouse.jpg', 0, 4),
 (7, 'Heels Wanita', 200000, 'heels.jpg', 0, 5),
 (8, 'Tas Wanita', 130000, 'taswanita.jpg', 8, 6),
-(12, 'Sepatu Lari', 1200000, '1775508200_sepatulari.jpg', 11, 2),
+(12, 'Sepatu Lari', 1200000, '1775508200_sepatulari.jpg', 7, 2),
 (13, 'Jaket Varsity', 400000, '1775511358_varsity.jpg', 18, 1);
 
 -- --------------------------------------------------------
@@ -252,13 +260,13 @@ INSERT INTO `user` (`id_user`, `nama`, `email`, `password`, `role`, `alamat`) VA
 -- (See below for the actual view)
 --
 CREATE TABLE `view_produk` (
-`id_produk` int
-,`nama_produk` varchar(100)
+`gambar` varchar(255)
 ,`harga` int
-,`stok` int
 ,`id_kategori` int
-,`gambar` varchar(255)
+,`id_produk` int
 ,`kategori` varchar(100)
+,`nama_produk` varchar(100)
+,`stok` int
 );
 
 -- --------------------------------------------------------
@@ -268,15 +276,15 @@ CREATE TABLE `view_produk` (
 -- (See below for the actual view)
 --
 CREATE TABLE `view_transaksi` (
-`id_pesanan` int
+`harga` int
+,`id_pesanan` int
 ,`id_user` int
-,`nama_user` varchar(100)
-,`nama_produk` varchar(100)
 ,`jumlah` int
-,`harga` int
-,`total` int
+,`nama_produk` varchar(100)
+,`nama_user` varchar(100)
 ,`status` varchar(50)
 ,`tanggal` datetime
+,`total` int
 );
 
 -- --------------------------------------------------------
@@ -351,7 +359,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `detail_pesanan`
 --
 ALTER TABLE `detail_pesanan`
-  MODIFY `id_detail` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_detail` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `kategori`
@@ -363,19 +371,19 @@ ALTER TABLE `kategori`
 -- AUTO_INCREMENT for table `keranjang`
 --
 ALTER TABLE `keranjang`
-  MODIFY `id_keranjang` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id_keranjang` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `pesanan`
 --
 ALTER TABLE `pesanan`
-  MODIFY `id_pesanan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_pesanan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id_produk` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_produk` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `user`

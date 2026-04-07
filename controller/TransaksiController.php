@@ -88,6 +88,22 @@ class TransaksiController {
     include 'view/checkout.php';
     }
 
+    public function ubahQty() {
+        if (!isset($_SESSION['user'])) {
+            header("Location: ?page=login");
+            exit;
+        }
+
+        $id_user = $_SESSION['user']['id'];
+        $id_keranjang = $_GET['id'] ?? 0;
+        $aksi = $_GET['aksi'] ?? ''; 
+
+        $this->model->updateQtyKeranjang($id_keranjang, $id_user, $aksi);
+        
+        header("Location: ?page=keranjang");
+        exit;
+    }
+
     public function prosesBayar() {
         if (!isset($_SESSION['user'])) {
             header("Location: ?page=login");
@@ -105,14 +121,14 @@ class TransaksiController {
         $metode = $_POST['metode_pembayaran'] ?? 'Transfer Bank';
         $deadlockMode = isset($_POST['deadlock_mode']) ? 1 : 0;
 
+        $result = $this->model->prosesCheckoutTerpilih($id_user, $selectedIds);
+
+        unset($_SESSION['checkout_items']);
+
         if ($deadlockMode == 1) {
             header("Location: ?page=deadlock-result&metode=" . urlencode($metode));
             exit;
         }
-
-        $result = $this->model->prosesCheckoutTerpilih($id_user, $selectedIds);
-
-        unset($_SESSION['checkout_items']);
 
         if ($result['status']) {
             header("Location: ?page=checkout-selesai&metode=" . urlencode($metode));

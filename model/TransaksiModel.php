@@ -16,7 +16,7 @@ class TransaksiModel {
     return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // VIEW TRANSAKSI USER
+    // Penerapan View 
     public function getRiwayatByUser($id_user) {
         $sql = "
             SELECT *
@@ -30,6 +30,8 @@ class TransaksiModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Penerapan Custom Function
+    // Penerapan Inner Join 2 Tabel Keranjang dan Produk
     public function getKeranjangByUser($id_user) {
         $sql = "SELECT 
                     k.id_keranjang,
@@ -39,9 +41,9 @@ class TransaksiModel {
                     p.stok,
                     p.gambar,
                     k.jumlah,
-                    hitung_total(k.jumlah, p.harga) AS subtotal
+                    hitung_total(k.jumlah, p.harga) AS subtotal 
                 FROM keranjang k
-                JOIN produk p ON k.id_produk = p.id_produk
+                INNER JOIN produk p ON k.id_produk = p.id_produk
                 WHERE k.id_user = :id_user
                 ORDER BY k.id_keranjang DESC";
 
@@ -56,6 +58,24 @@ class TransaksiModel {
             WHERE id_keranjang = ? AND id_user = ?
         ");
         return $stmt->execute([$id_keranjang, $id_user]);
+    }
+
+    public function updateQtyKeranjang($id_keranjang, $id_user, $aksi) {
+        $stmt = $this->db->prepare("SELECT jumlah FROM keranjang WHERE id_keranjang = ? AND id_user = ?");
+        $stmt->execute([$id_keranjang, $id_user]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$data) return false;
+
+        $jumlahBaru = $data['jumlah'];
+        if ($aksi == 'tambah') {
+            $jumlahBaru++; // Langsung tambah tanpa cek stok database di sini
+        } elseif ($aksi == 'kurang' && $data['jumlah'] > 1) {
+            $jumlahBaru--;
+        }
+
+        $update = $this->db->prepare("UPDATE keranjang SET jumlah = ? WHERE id_keranjang = ?");
+        return $update->execute([$jumlahBaru, $id_keranjang]);
     }
 
     public function getSelectedKeranjangItems($id_user, $selectedIds) {
@@ -90,6 +110,7 @@ class TransaksiModel {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    
     public function prosesCheckoutTerpilih($id_user, $selectedIds) {
         if (empty($selectedIds)) {
             return [
@@ -149,7 +170,7 @@ class TransaksiModel {
 
             foreach ($items as $item) {
                 if ($item['stok'] < $item['jumlah']) {
-                    throw new Exception("Stok produk '{$item['nama']}' tidak cukup");
+                    throw new Exception("Stok produk '{$item['nama']}' tidak cukup. Tersisa: {$item['stok']}");
                 }
 
                 $stmtDetail->execute([

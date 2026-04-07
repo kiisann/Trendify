@@ -13,7 +13,7 @@ class ProdukModel {
         return $data;
     }
 
-    // UNION
+    // Penerapan Union
     public function getRekomendasi() {
         $sql = "SELECT p.nama, p.harga, 'Pria' AS kategori
                 FROM produk p

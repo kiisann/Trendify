@@ -24,13 +24,13 @@
                             </div>
                         </div>
 
-                        <?php $grandTotal = 0; ?>
                         <?php foreach ($keranjang as $item): ?>
-                            <?php $grandTotal += $item['subtotal']; ?>
                             <div class="cart-item-card">
                                 <div class="d-flex align-items-center">
                                     <div class="form-check custom-check me-3">
-                                        <input class="form-check-input item-checkbox" type="checkbox" name="pilih_item[]" value="<?= $item['id_keranjang']; ?>">
+                                        <input class="form-check-input item-checkbox" type="checkbox" name="pilih_item[]" 
+                                               value="<?= $item['id_keranjang']; ?>" 
+                                               data-subtotal="<?= $item['subtotal']; ?>">
                                     </div>
                                     
                                     <div class="item-img-box">
@@ -49,7 +49,17 @@
                                         </div>
                                         
                                         <div class="d-flex justify-content-between align-items-end mt-2">
-                                            <div class="qty-badge">Jumlah: <strong><?= $item['jumlah']; ?></strong></div>
+                                            <div class="d-flex align-items-center gap-3">
+                                                <a href="?page=ubah_qty&id=<?= $item['id_keranjang']; ?>&aksi=kurang" 
+                                                   class="text-decoration-none text-dark h4 mb-0" 
+                                                   style="line-height: 1; cursor: pointer;">−</a>
+                                                
+                                                <span class="fw-bold h5 mb-0"><?= $item['jumlah']; ?></span>
+                                                
+                                                <a href="?page=ubah_qty&id=<?= $item['id_keranjang']; ?>&aksi=tambah" 
+                                                   class="text-decoration-none text-dark h4 mb-0" 
+                                                   style="line-height: 1; cursor: pointer;">+</a>
+                                            </div>
                                             <div class="subtotal-item">Rp <?= number_format($item['subtotal'], 0, ',', '.'); ?></div>
                                         </div>
                                     </div>
@@ -58,14 +68,14 @@
                         <?php endforeach; ?>
                     </div>
                 </div>
-
+                
                 <div class="col-lg-4">
                     <div class="summary-card sticky-top" style="top: 100px; z-index: 10;">
                         <h5 class="fw-bold mb-4">Ringkasan Belanja</h5>
                         
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Total Harga</span>
-                            <span class="fw-bold">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></span>
+                            <span class="fw-bold" id="display-total-harga">Rp 0</span>
                         </div>
                         <div class="d-flex justify-content-between mb-4">
                             <span class="text-muted">Biaya Admin</span>
@@ -76,7 +86,7 @@
                         
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span class="fw-bold">Total Tagihan</span>
-                            <span class="total-amount">Rp <?= number_format($grandTotal, 0, ',', '.'); ?></span>
+                            <span class="total-amount" id="display-total-tagihan">Rp 0</span>
                         </div>
 
                         <button type="submit" class="btn-checkout-main">
@@ -132,7 +142,6 @@
 
     .product-name { font-weight: 700; margin-bottom: 4px; color: var(--t-dark); }
     .product-price { font-size: 0.9rem; color: var(--t-text-muted); margin-bottom: 0; }
-    .qty-badge { font-size: 0.85rem; color: #555; background: var(--t-gray); padding: 4px 12px; border-radius: 20px; }
     .subtotal-item { font-weight: 800; color: var(--t-dark); font-size: 1.05rem; }
     
     .btn-remove-item { color: #ef4444; font-size: 1.2rem; transition: 0.2s; padding: 5px; }
@@ -176,12 +185,35 @@
     const checkAll = document.getElementById('checkAll');
     const itemCheckboxes = document.querySelectorAll('.item-checkbox');
     const formCheckout = document.getElementById('form-checkout');
+    const displayTotalHarga = document.getElementById('display-total-harga');
+    const displayTotalTagihan = document.getElementById('display-total-tagihan');
+
+    // Fungsi Hitung Dinamis
+    function hitungUlangTotal() {
+        let total = 0;
+        itemCheckboxes.forEach(cb => {
+            if (cb.checked) {
+                total += parseInt(cb.getAttribute('data-subtotal'));
+            }
+        });
+
+        // Format Rupiah
+        const formatted = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(total).replace("Rp", "Rp ");
+
+        displayTotalHarga.innerText = formatted;
+        displayTotalTagihan.innerText = formatted;
+    }
 
     if (checkAll) {
         checkAll.addEventListener('change', function () {
             itemCheckboxes.forEach(cb => {
                 cb.checked = this.checked;
             });
+            hitungUlangTotal();
         });
     }
 
@@ -190,6 +222,7 @@
             const totalItems = itemCheckboxes.length;
             const checkedItems = document.querySelectorAll('.item-checkbox:checked').length;
             if (checkAll) checkAll.checked = (totalItems === checkedItems);
+            hitungUlangTotal();
         });
     });
 
@@ -202,4 +235,7 @@
             }
         });
     }
+
+    // Jalankan saat load awal agar Rp 0
+    hitungUlangTotal();
 </script>

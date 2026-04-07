@@ -134,10 +134,10 @@ if ($hour >= 5 && $hour < 12) {
     }
 
     .login-card h2 {
-        font-weight: 700;
-        font-size: 2.5rem;
-        margin-bottom: 20px;
-        color: var(--dark-text);
+    font-weight: 800; 
+    font-size: 2.8rem; 
+    margin-bottom: 15px;
+    color: var(--dark-text);
     }
 
     .login-mini-desc {
@@ -164,7 +164,7 @@ if ($hour >= 5 && $hour < 12) {
         display: block;
         font-size: 0.85rem;
         font-weight: 600;
-        margin-bottom: 8px;
+        margin-bottom: 15px;
         color: var(--dark-text);
     }
 
@@ -281,7 +281,7 @@ if ($hour >= 5 && $hour < 12) {
 
             <form method="POST" action="">
                 <div class="login-field">
-                    <label class="login-label">Email Address / Username</label>
+                    <label class="login-label">Email Address</label>
                     <input type="email" name="email" class="login-input" placeholder="name@example.com" required>
                 </div>
 
