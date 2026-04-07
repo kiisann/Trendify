@@ -71,13 +71,13 @@ if ($_SESSION['user']['role'] != 'admin') {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #111111; /* ← ini jadi hitam */
+    color: #111111;
 }
 
 .hero-brand p {
     margin: 0;
     font-size: 0.9rem;
-    color: #6B7280; /* abu soft biar elegan */
+    color: #6B7280;
 }
 
     .hero-title {

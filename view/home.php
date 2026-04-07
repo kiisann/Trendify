@@ -7,7 +7,6 @@
         --border-color: #E5E7EB;
     }
 
-    /* Hero Section - Aesthetic & Fluid */
     .hero {
         background: radial-gradient(circle at 10% 20%, #B8A6FC 0%, transparent 40%),
                     radial-gradient(circle at 90% 80%, #FDF2F8 0%, transparent 40%),

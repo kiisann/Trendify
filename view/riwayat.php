@@ -19,9 +19,7 @@
                     <tbody>
                         <?php if (!empty($riwayat)): ?>
                             <?php foreach ($riwayat as $row): 
-                                // Ambil ID untuk tracking
                                 $id_track = $row['id_transaksi'] ?? $row['id'] ?? '0';
-                                // Normalisasi status agar tidak salah baca (kecilkan semua huruf)
                                 $status_db = strtolower($row['status'] ?? '');
                             ?>
                                 <tr>

@@ -1,5 +1,5 @@
 <?php
-// Pastikan variabel status diambil dengan benar dan diubah ke huruf kecil
+
 $status_aktif = strtolower($data_detail['status'] ?? 'pending');
 ?>
 

@@ -5,11 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once 'config/koneksi.php';
 
-/*
-|--------------------------------------------------------------------------
-| AJAX HANDLER (DI FILE YANG SAMA)
-|--------------------------------------------------------------------------
-*/
 if (isset($_POST['ajax'])) {
     header('Content-Type: application/json');
     ob_clean();
