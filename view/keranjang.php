@@ -4,10 +4,10 @@
     <?php if (isset($_GET['status'])): ?>
         <div class="alert-custom <?= in_array($_GET['status'], ['ditambahkan', 'berhasil']) ? 'alert-success-soft' : 'alert-warning-soft'; ?> mb-4">
             <?php 
-                if($_GET['status'] == 'ditambahkan') echo "Produk berhasil ditambahkan.";
-                elseif($_GET['status'] == 'dihapus') echo "Produk dihapus dari keranjang.";
-                elseif($_GET['status'] == 'berhasil') echo "Transaksi berhasil diproses.";
-                elseif($_GET['status'] == 'gagal') echo htmlspecialchars($_GET['msg'] ?? 'Transaksi gagal.');
+                if ($_GET['status'] == 'ditambahkan') echo "Produk berhasil ditambahkan.";
+                elseif ($_GET['status'] == 'dihapus') echo "Produk dihapus dari keranjang.";
+                elseif ($_GET['status'] == 'berhasil') echo "Transaksi berhasil diproses.";
+                elseif ($_GET['status'] == 'gagal') echo htmlspecialchars($_GET['msg'] ?? 'Transaksi gagal.');
             ?>
         </div>
     <?php endif; ?>
@@ -25,16 +25,18 @@
                         </div>
 
                         <?php foreach ($keranjang as $item): ?>
-                            <div class="cart-item-card">
+                            <div class="cart-item-card" id="item-<?= $item['id_keranjang']; ?>">
                                 <div class="d-flex align-items-center">
                                     <div class="form-check custom-check me-3">
-                                        <input class="form-check-input item-checkbox" type="checkbox" name="pilih_item[]" 
-                                               value="<?= $item['id_keranjang']; ?>" 
+                                        <input class="form-check-input item-checkbox"
+                                               type="checkbox"
+                                               name="pilih_item[]"
+                                               value="<?= $item['id_keranjang']; ?>"
                                                data-subtotal="<?= $item['subtotal']; ?>">
                                     </div>
                                     
                                     <div class="item-img-box">
-                                        <img src="assets/img/<?= !empty($item['gambar']) ? $item['gambar'] : 'default.jpg'; ?>" alt="produk">
+                                        <img src="assets/img/<?= !empty($item['gambar']) ? htmlspecialchars($item['gambar']) : 'default.jpg'; ?>" alt="produk">
                                     </div>
 
                                     <div class="item-info-flex flex-grow-1 ms-3">
@@ -42,25 +44,33 @@
                                             <div>
                                                 <h6 class="product-name"><?= htmlspecialchars($item['nama']); ?></h6>
                                             </div>
-                                            <a href="?page=hapus-keranjang&id=<?= $item['id_keranjang']; ?>" 
-                                               class="btn-remove-item" onclick="return confirm('Hapus item ini?')">
+                                            <a href="?page=hapus-keranjang&id=<?= $item['id_keranjang']; ?>"
+                                               class="btn-remove-item"
+                                               onclick="return confirm('Hapus item ini?')">
                                                <i class="bi bi-trash"></i>
                                             </a>
                                         </div>
                                         
                                         <div class="d-flex justify-content-between align-items-end mt-2">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <a href="?page=ubah_qty&id=<?= $item['id_keranjang']; ?>&aksi=kurang" 
-                                                   class="text-decoration-none text-dark h4 mb-0" 
-                                                   style="line-height: 1; cursor: pointer;">−</a>
+                                            <div class="d-flex align-items-center gap-3 qty-box">
+                                                <button type="button"
+                                                        class="qty-action-btn"
+                                                        data-id="<?= $item['id_keranjang']; ?>"
+                                                        data-aksi="kurang">−</button>
                                                 
-                                                <span class="fw-bold h5 mb-0"><?= $item['jumlah']; ?></span>
+                                                <span class="fw-bold h5 mb-0 item-jumlah" id="qty-<?= $item['id_keranjang']; ?>">
+                                                    <?= $item['jumlah']; ?>
+                                                </span>
                                                 
-                                                <a href="?page=ubah_qty&id=<?= $item['id_keranjang']; ?>&aksi=tambah" 
-                                                   class="text-decoration-none text-dark h4 mb-0" 
-                                                   style="line-height: 1; cursor: pointer;">+</a>
+                                                <button type="button"
+                                                        class="qty-action-btn qty-plus"
+                                                        data-id="<?= $item['id_keranjang']; ?>"
+                                                        data-aksi="tambah">+</button>
                                             </div>
-                                            <div class="subtotal-item">Rp <?= number_format($item['subtotal'], 0, ',', '.'); ?></div>
+
+                                            <div class="subtotal-item" id="subtotal-<?= $item['id_keranjang']; ?>">
+                                                Rp <?= number_format($item['subtotal'], 0, ',', '.'); ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -133,19 +143,64 @@
         padding: 20px;
         border-radius: 16px;
         border: 1px solid #eee;
-        transition: 0.3s;
+        transition: 0.2s ease;
     }
-    .cart-item-card:hover { border-color: var(--t-purple); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
 
-    .item-img-box { width: 80px; height: 80px; background: var(--t-gray); border-radius: 12px; overflow: hidden; flex-shrink: 0; }
-    .item-img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item-card:hover { 
+        border-color: var(--t-purple); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.02); 
+    }
 
-    .product-name { font-weight: 700; margin-bottom: 4px; color: var(--t-dark); }
-    .product-price { font-size: 0.9rem; color: var(--t-text-muted); margin-bottom: 0; }
-    .subtotal-item { font-weight: 800; color: var(--t-dark); font-size: 1.05rem; }
+    .cart-item-card.updating {
+        opacity: .7;
+        pointer-events: none;
+    }
+
+    .item-img-box { 
+        width: 80px; 
+        height: 80px; 
+        background: var(--t-gray); 
+        border-radius: 12px; 
+        overflow: hidden; 
+        flex-shrink: 0; 
+    }
+
+    .item-img-box img { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover; 
+        display: block;
+    }
+
+    .product-name { 
+        font-weight: 700; 
+        margin-bottom: 4px; 
+        color: var(--t-dark); 
+    }
+
+    .product-price {
+        font-size: 0.9rem;
+        color: var(--t-text-muted);
+        margin-bottom: 0;
+    }
+
+    .subtotal-item { 
+        font-weight: 800; 
+        color: var(--t-dark); 
+        font-size: 1.05rem; 
+    }
     
-    .btn-remove-item { color: #ef4444; font-size: 1.2rem; transition: 0.2s; padding: 5px; }
-    .btn-remove-item:hover { transform: scale(1.1); color: #dc2626; }
+    .btn-remove-item { 
+        color: #ef4444; 
+        font-size: 1.2rem; 
+        transition: 0.2s; 
+        padding: 5px; 
+    }
+
+    .btn-remove-item:hover { 
+        transform: scale(1.1); 
+        color: #dc2626; 
+    }
 
     .summary-card {
         background: #fff;
@@ -154,7 +209,12 @@
         border: 1px solid #eee;
         box-shadow: 0 10px 30px rgba(0,0,0,0.03);
     }
-    .total-amount { font-size: 1.4rem; font-weight: 800; color: var(--t-purple); }
+
+    .total-amount { 
+        font-size: 1.4rem; 
+        font-weight: 800; 
+        color: var(--t-purple); 
+    }
 
     .btn-checkout-main {
         width: 100%;
@@ -166,69 +226,141 @@
         font-weight: 700;
         transition: 0.3s;
     }
-    .btn-checkout-main:hover { background: #000; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+    .btn-checkout-main:hover { 
+        background: #000; 
+        transform: translateY(-2px); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+    }
 
     .btn-continue-shopping {
-        display: block; width: 100%; text-align: center; text-decoration: none;
-        color: var(--t-text-muted); font-size: 0.9rem; font-weight: 600;
+        display: block;
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+        color: var(--t-text-muted);
+        font-size: 0.9rem;
+        font-weight: 600;
     }
-    .btn-continue-shopping:hover { color: var(--t-purple); }
 
-    .custom-check .form-check-input:checked { background-color: var(--t-purple); border-color: var(--t-purple); }
-    .empty-icon { font-size: 4rem; margin-bottom: 10px; }
+    .btn-continue-shopping:hover { 
+        color: var(--t-purple); 
+    }
 
-    .fade-in { animation: fadeIn 0.5s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .custom-check .form-check-input:checked { 
+        background-color: var(--t-purple); 
+        border-color: var(--t-purple); 
+    }
+
+    .empty-icon { 
+        font-size: 4rem; 
+        margin-bottom: 10px; 
+    }
+
+    .fade-in { 
+        animation: fadeIn 0.5s ease; 
+    }
+
+    .qty-action-btn {
+        width: 38px;
+        height: 38px;
+        border: none;
+        border-radius: 10px;
+        background: #f3f4f6;
+        color: #222;
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.18s ease;
+    }
+
+    .qty-plus {
+        background: #ead5f7;
+    }
+
+    .qty-action-btn:hover {
+        background: var(--t-purple);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .qty-box .item-jumlah {
+        min-width: 22px;
+        text-align: center;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
 <script>
     const checkAll = document.getElementById('checkAll');
-    const itemCheckboxes = document.querySelectorAll('.item-checkbox');
     const formCheckout = document.getElementById('form-checkout');
     const displayTotalHarga = document.getElementById('display-total-harga');
     const displayTotalTagihan = document.getElementById('display-total-tagihan');
 
-    // Fungsi Hitung Dinamis
-    function hitungUlangTotal() {
-        let total = 0;
-        itemCheckboxes.forEach(cb => {
-            if (cb.checked) {
-                total += parseInt(cb.getAttribute('data-subtotal'));
-            }
-        });
-
-        // Format Rupiah
-        const formatted = new Intl.NumberFormat('id-ID', {
+    function formatRupiah(total) {
+        return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0
-        }).format(total).replace("Rp", "Rp ");
+        }).format(total).replace('Rp', 'Rp ');
+    }
 
-        displayTotalHarga.innerText = formatted;
-        displayTotalTagihan.innerText = formatted;
+    function getItemCheckboxes() {
+        return document.querySelectorAll('.item-checkbox');
+    }
+
+    function hitungUlangTotal() {
+        let total = 0;
+
+        getItemCheckboxes().forEach(cb => {
+            if (cb.checked) {
+                total += parseInt(cb.dataset.subtotal || 0);
+            }
+        });
+
+        const formatted = formatRupiah(total);
+
+        if (displayTotalHarga) displayTotalHarga.textContent = formatted;
+        if (displayTotalTagihan) displayTotalTagihan.textContent = formatted;
+    }
+
+    function handleCheckboxChange() {
+        const itemCheckboxes = getItemCheckboxes();
+        const totalItems = itemCheckboxes.length;
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked').length;
+
+        if (checkAll) {
+            checkAll.checked = totalItems > 0 && totalItems === checkedItems;
+        }
+
+        hitungUlangTotal();
+    }
+
+    function bindCheckboxEvents() {
+        getItemCheckboxes().forEach(cb => {
+            cb.onchange = handleCheckboxChange;
+        });
     }
 
     if (checkAll) {
         checkAll.addEventListener('change', function () {
-            itemCheckboxes.forEach(cb => {
-                cb.checked = this.checked;
-            });
-            hitungUlangTotal();
+            getItemCheckboxes().forEach(cb => cb.checked = this.checked);
+            handleCheckboxChange();
         });
     }
-
-    itemCheckboxes.forEach(cb => {
-        cb.addEventListener('change', function () {
-            const totalItems = itemCheckboxes.length;
-            const checkedItems = document.querySelectorAll('.item-checkbox:checked').length;
-            if (checkAll) checkAll.checked = (totalItems === checkedItems);
-            hitungUlangTotal();
-        });
-    });
 
     if (formCheckout) {
         formCheckout.addEventListener('submit', function (e) {
             const checkedItems = document.querySelectorAll('.item-checkbox:checked').length;
+
             if (checkedItems === 0) {
                 e.preventDefault();
                 alert('Pilih minimal satu produk untuk checkout.');
@@ -236,6 +368,79 @@
         });
     }
 
-    // Jalankan saat load awal agar Rp 0
+    async function updateQty(id, aksi) {
+        const card = document.getElementById('item-' + id);
+        const qtyEl = document.getElementById('qty-' + id);
+        const subtotalEl = document.getElementById('subtotal-' + id);
+        const checkbox = card ? card.querySelector('.item-checkbox') : null;
+
+        if (!card || !qtyEl || !subtotalEl) return;
+
+        card.classList.add('updating');
+
+        try {
+            const fd = new FormData();
+            fd.append('ajax', '1');
+            fd.append('id', id);
+            fd.append('aksi', aksi);
+
+            const res = await fetch(window.location.href, {
+                method: 'POST',
+                body: fd
+            });
+
+            const text = await res.text();
+
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                alert(text);
+                return;
+            }
+
+            if (!data.success) {
+                alert(data.message || 'Gagal update');
+                return;
+            }
+
+            if (data.deleted) {
+                card.remove();
+
+                if (document.querySelectorAll('.cart-item-card').length === 0) {
+                    location.reload();
+                    return;
+                }
+
+                bindCheckboxEvents();
+                handleCheckboxChange();
+                return;
+            }
+
+            qtyEl.textContent = data.qty;
+            subtotalEl.textContent = data.subtotal_format;
+
+            if (checkbox) {
+                checkbox.dataset.subtotal = data.subtotal;
+            }
+
+            handleCheckboxChange();
+        } catch (err) {
+            alert('AJAX gagal');
+        } finally {
+            card.classList.remove('updating');
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.qty-action-btn');
+        if (!btn) return;
+
+        e.preventDefault();
+        updateQty(btn.dataset.id, btn.dataset.aksi);
+    });
+
+    bindCheckboxEvents();
     hitungUlangTotal();
+    handleCheckboxChange();
 </script>

@@ -31,10 +31,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         --shadow-card: 0 12px 28px rgba(139, 92, 246, 0.05);
     }
 
-    html, body {
-        overflow-x: hidden;
-    }
-
     body {
         background: var(--bg);
         font-family: 'Inter', sans-serif;
@@ -47,7 +43,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         border-radius: 26px;
         padding: 24px;
         box-shadow: var(--shadow-soft);
-        overflow: hidden;
     }
 
     .product-hero {
@@ -61,18 +56,19 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         overflow: hidden;
     }
 
-    .product-title {
-        font-size: 3.8rem;
-        font-weight: 900;
-        letter-spacing: -2px;
-        line-height: 1.1;
-        margin-bottom: 10px;
-        background: linear-gradient(135deg, #111111, #6B7280);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
+   .product-title {
+    font-size: 3.8rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 10px;
 
+    background: linear-gradient(135deg, #111111, #6B7280);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
     .product-desc {
         font-size: 1.05rem;
         color: #7C4D9E;
@@ -182,33 +178,15 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         color: #fff;
     }
 
-    /* BAGIAN PENTING: BIAR BISA DIGESER */
     .table-wrap {
         border: 1px solid #ECE7F5;
         border-radius: 20px;
-        overflow-x: auto;
-        overflow-y: hidden;
+        overflow: hidden;
         background: #fff;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table-wrap::-webkit-scrollbar {
-        height: 10px;
-    }
-
-    .table-wrap::-webkit-scrollbar-track {
-        background: #F5F3FF;
-        border-radius: 999px;
-    }
-
-    .table-wrap::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #8B5CF6, #A78BFA);
-        border-radius: 999px;
     }
 
     .table {
         margin-bottom: 0;
-        min-width: 900px; /* supaya tabel bisa discroll saat layar sempit */
     }
 
     .table thead th {
@@ -227,7 +205,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         vertical-align: middle;
         border-color: #EEF0F3;
         font-size: 0.98rem;
-        white-space: nowrap;
     }
 
     .table tbody tr:hover {
@@ -238,16 +215,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         font-weight: 700;
         font-size: 0.98rem;
         color: #1F2937;
-    }
-
-    .product-img-thumb {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 12px;
-        border: 1px solid #E5E7EB;
-        background: #fff;
-        display: block;
     }
 
     .badge-soft {
@@ -262,7 +229,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         line-height: 1.5;
         min-width: 150px;
         text-align: center;
-        white-space: normal;
     }
 
     .action-group {
@@ -358,7 +324,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
 
     @media (max-width: 991px) {
         .product-title {
-            font-size: 2.4rem;
+            font-size: 2.2rem;
         }
     }
 
@@ -373,7 +339,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         }
 
         .product-title {
-            font-size: 1.9rem;
+            font-size: 1.8rem;
         }
 
         .mini-title {
@@ -387,21 +353,15 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
         .action-group {
             gap: 8px;
         }
-
-        .table {
-            min-width: 780px;
-        }
     }
 </style>
 
-<div class="container mt-4 mb-5">
+<div class="container mt-4">
     <div class="product-shell">
 
         <div class="product-hero">
             <h3 class="product-title">Manajemen Produk</h3>
-            <p class="product-desc">
-                Kelola produk Anda dengan mudah. Tambah, edit, atau hapus produk sesuai kebutuhan untuk menjaga toko Anda tetap segar dan menarik bagi pelanggan.
-            </p>
+            <p class="product-desc">Kelola produk Anda dengan mudah. Tambah, edit, atau hapus produk sesuai kebutuhan untuk menjaga toko Anda tetap segar dan menarik bagi pelanggan.</p>
         </div>
 
         <?php if (isset($_GET['status'])): ?>
@@ -471,7 +431,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
                     <div class="card-body">
                         <h5 class="mini-title">Daftar Produk</h5>
 
-                        <div class="table-wrap">
+                        <div class="table-responsive table-wrap">
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
@@ -489,7 +449,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
                                             <tr>
                                                 <td>
                                                     <?php if (!empty($row['gambar'])): ?>
-                                                        <img src="assets/img/<?= htmlspecialchars($row['gambar']); ?>" class="product-img-thumb" alt="<?= htmlspecialchars($row['nama_produk']); ?>">
+                                                        <img src="assets/img/<?= htmlspecialchars($row['gambar']); ?>" width="60" height="60" style="object-fit:cover; border-radius:8px;">
                                                     <?php else: ?>
                                                         <span class="text-muted">Tidak ada</span>
                                                     <?php endif; ?>
@@ -516,6 +476,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
                                                 </td>
                                             </tr>
 
+                                            <!-- MODAL EDIT -->
                                             <div class="modal fade" id="editModal<?= $row['id_produk']; ?>" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
@@ -573,10 +534,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
                                 </tbody>
                             </table>
                         </div>
-
-                        <small class="text-muted d-block mt-3">
-                            Geser tabel ke kanan atau kiri jika seluruh kolom belum terlihat.
-                        </small>
                     </div>
                 </div>
             </div>
