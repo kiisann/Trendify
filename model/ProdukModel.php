@@ -15,15 +15,15 @@ class ProdukModel {
 
     // Penerapan Union
     public function getRekomendasi() {
-        $sql = "SELECT p.nama, p.harga, 'Pria' AS kategori
+        $sql = "SELECT p.nama, p.harga,p.gambar, 'Pria' AS kategori
                 FROM produk p
                 JOIN kategori k ON p.id_kategori = k.id_kategori
-                WHERE k.nama LIKE 'Pria%' AND p.stok > 0
+                WHERE k.nama LIKE 'Pria%' AND p.stok < 5
                 UNION
-                SELECT p.nama, p.harga, 'Wanita' AS kategori
+                SELECT p.nama, p.harga, p.gambar, 'Wanita' AS kategori
                 FROM produk p
                 JOIN kategori k ON p.id_kategori = k.id_kategori
-                WHERE k.nama LIKE 'Wanita%' AND p.stok > 0";
+                WHERE k.nama LIKE 'Wanita%' AND p.stok < 5";
                 
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

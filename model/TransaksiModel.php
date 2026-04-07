@@ -129,8 +129,7 @@ class TransaksiModel {
             $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
             if (empty($items)) throw new Exception("Item keranjang tidak ditemukan");
-
-            // DISINI PERBAIKANNYA: Status diatur ke 'dikemas'
+    
             $stmtPesanan = $this->db->prepare("
                 INSERT INTO pesanan (id_user, tanggal, status)
                 VALUES (?, CURDATE(), 'dikemas')

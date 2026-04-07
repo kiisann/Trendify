@@ -154,7 +154,6 @@ class TransaksiController {
         }
 
         $id_user = $_SESSION['user']['id'];
-        // Pastikan variabel ini konsisten
         $id_cari = $_GET['id'] ?? '';
 
         $riwayat = $this->model->getRiwayatByUser($id_user);
@@ -162,8 +161,6 @@ class TransaksiController {
         $data_detail = null;
         if (!empty($riwayat)) {
             foreach ($riwayat as $r) {
-                // SESUAIKAN: Gunakan 'id_pesanan' sesuai View di database kamu
-                // Gunakan variabel $id_cari yang sudah didefinisikan di atas
                 if ($r['id_pesanan'] == $id_cari) {
                     $data_detail = $r;
                     break;
